@@ -1,0 +1,19 @@
+{
+  "name": "wz-projects",
+  "version": "1.0.0",
+  "description": "Bruteforce Vanity Key Generator",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "libsodium-wrappers": "^0.8.2",
+    "libsodium-wrappers-sumo": "^0.8.2",
+    "vite": "^7.3.1"
+  }
+}
