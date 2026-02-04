@@ -1,10 +1,15 @@
 # Vanity Ed25519 Key Generator
 
-High-performance parallel bruteforce tool for generating Ed25519 keypairs whose public key SHA256 hash matches a regex pattern.
+High-performance parallel bruteforce tools for generating Ed25519 keypairs matching regex patterns.
+
+**Two modes:**
+- **Hash vanity**: Match patterns in SHA256 hash of public key (hex)
+- **Public key vanity**: Match patterns in base64 public key directly
 
 ## Performance
 
-- **C++ version**: ~650,000 keys/s (12 threads)
+- **C++ hash version**: ~650,000 keys/s (12 threads)
+- **C++ pubkey version**: ~40,000 keys/s (12 threads)
 - **Python version**: ~300,000 keys/s (12 threads)
 - **web version**: ~5000 keys/s (no threads, webassembly)
 
@@ -12,8 +17,8 @@ High-performance parallel bruteforce tool for generating Ed25519 keypairs whose 
 
 | File | Description |
 |------|-------------|
-| `hashes_fast.cpp` | High-performance C++ implementation |
-| `hashes_fast.exe` | Compiled executable (requires MSYS2 runtime) |
+| `hashes_fast.cpp` | C++ - search SHA256 hash of public key (hex) |
+| `pubkey_vanity_fast.cpp` | C++ - search base64 public key directly |
 | `hashes_parallel.py` | Python multiprocessing version |
 | `hashes.py` | Original single-threaded Python version |
 
@@ -32,8 +37,11 @@ High-performance parallel bruteforce tool for generating Ed25519 keypairs whose 
 # In PowerShell, add MSYS2 to PATH first
 $env:Path = "C:\msys64\ucrt64\bin;" + $env:Path
 
-# Compile
+# Compile hash vanity (searches SHA256 hash in hex)
 g++ -O3 -march=native -mtune=native -std=c++17 -pthread -ffast-math -funroll-loops -flto -o hashes_fast.exe hashes_fast.cpp
+
+# Compile pubkey vanity (searches base64 public key)
+g++ -O3 -march=native -mtune=native -std=c++17 -pthread -ffast-math -funroll-loops -flto -o pubkey_vanity_fast.exe pubkey_vanity_fast.cpp
 ```
 
 ### Running
@@ -61,13 +69,14 @@ Copy these DLLs from `C:\msys64\ucrt64\bin\` to the same folder as the exe:
 
 ```
 hashes_fast.exe <regex_pattern> [num_workers]
+pubkey_vanity_fast.exe <regex_pattern> [num_workers]
 ```
 
 **Arguments:**
-- `regex_pattern` - Regex to match against the SHA256 hash (hex string)
+- `regex_pattern` - Regex to match against the target string
 - `num_workers` - Number of parallel workers (default: CPU cores)
 
-**Examples:**
+**Examples - Hash Vanity (hex):**
 ```powershell
 # Find hash starting with "bfc0"
 .\hashes_fast.exe "^bfc0" 12
@@ -77,6 +86,21 @@ hashes_fast.exe <regex_pattern> [num_workers]
 
 # Find hash containing "dead"
 .\hashes_fast.exe "dead" 12
+```
+
+**Examples - Public Key Vanity (base64):**
+```powershell
+# Find public key starting with "ABC"
+.\pubkey_vanity_fast.exe "^ABC" 12
+
+# Find public key containing "hello" (case sensitive)
+.\pubkey_vanity_fast.exe "hello" 12
+
+# Find public key containing "cat" or "Cat"
+.\pubkey_vanity_fast.exe "[Cc]at" 12
+
+# Find public key starting with "noob"
+.\pubkey_vanity_fast.exe "^noob" 12
 ```
 
 ---
